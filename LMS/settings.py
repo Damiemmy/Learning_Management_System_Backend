@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'anymail',
 
 ]
 
@@ -143,6 +144,19 @@ MEDIA_ROOT=BASE_DIR/'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'userauth.User'
+
+
+MAILGUN_API_KEY=env("MAILGUN_API_KEY")
+MAILGUN_SENDER_DOMAIN=env("MAILGUN_SENDER_DOMAIN")
+
+ANYMAIL={
+    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
+    "MAILGUN_SENDER_DOMAIN":env("MAILGUN_SENDER_DOMAIN")
+}
+
+FROM_EMAIL=env("FROM_EMAIL")
+EMAIL_BACKEND='anymail.backends.mailgun.EmailBackend'
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=50),
