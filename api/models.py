@@ -32,6 +32,12 @@ PLATFORM_STATUS=(
     ("Published","Published"),
 
 )
+PAYMENT_STATUS=(
+    ("Paid","Paid"),
+    ("Processing","Processing"),
+    ("Failed","Failed"),
+
+)
 
 
 class Teacher(models.Model):
@@ -185,6 +191,7 @@ class Question_Answer_Message(models.Model):
     user=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
     message=models.TextField(null=True,blank=True)
     qam_id=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="123456789")
+    qa_id=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="123456789")
     date=models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -193,5 +200,88 @@ class Question_Answer_Message(models.Model):
     class Meta:
         ordering=['date']
 
+class Cart(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.SET_NULL, blank=True,null=True)
+    price=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    task=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    country=models.CharField(max_length=100, blank=True,null=True)
+    cart_id=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="123456789")
+    date=models.DateTimeField(default=timezone.now)
 
+    def __str__(self):
+        return self.course.title
+class CartOrder(models.Model):
+    student=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
+    teachers=models.ManyToManyField(Teacher,blank=True)
+    sub_total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    task_fee=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    initial_total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    saved=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    payment_status=models.CharField(choices=PAYMENT_STATUS,default='Processing')
+    full_name=models.CharField(max_length=1000,null=True,blank=True)
+    email=models.CharField(max_length=1000,null=True,blank=True)
+    country=models.CharField(max_length=1000,null=True,blank=True)
+    coupons=models.ManyToManyField("api.Coupons",blank=True)
+    stripe_session_id=models.CharField(max_length=1000,null=True,blank=True)
+    oid=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="123456789")
+    date=models.DateTimeField(default=timezone.now)
 
+    class Meta:
+        ordering=['-date']
+
+    def order_items(self):
+        return CartOrderItem.objects.filter(order=self)
+    
+    def __str__(self):
+        return self.oid
+
+class CartOrderItem(models.Model):
+    order=models.ForeignKey(CartOrder,on_delete=models.CASCADE, related_name="orderitem")
+    course=models.ForeignKey(Course,on_delete=models.CASCADE, related_name="order_item")
+    teacher=models.ForeignKey(Teacher,on_delete=models.CASCADE)
+    task_fee=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    initial_total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    saved=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    coupons=models.ForeignKey("api.Coupons",on_delete=models.SET_NULL,null=True,blank=True)
+    applied_coupon=models.BooleanField(default=False)
+    oid=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="123456789")
+    date=models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering=['-date']
+
+    def order_id(self):
+        return f"order ID #{self.order.oid}"
+
+    def payment_status(self):
+        return f"{self.order.payment_status}"
+    
+    def __str__(self):
+        return self.oid
+
+class Certificate(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE,related_name='order_item')
+    user=models.ForeignKey(User,on_delete=models.SET_NULL, blank=True,null=True)
+    certificate_id=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="123456789")
+    date=models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.course.title
+
+class CompletedLesson(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.SET_NULL, blank=True,null=True)
+    variant_item=models.ForeignKey(VariantItem,on_delete=models.CASCADE)
+    date=models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.course.title
+
+    
+
+    
+    
