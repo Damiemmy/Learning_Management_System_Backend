@@ -216,6 +216,9 @@ class Question_Answer_Message(models.Model):
     class Meta:
         ordering=['date']
 
+    def profile(self):
+        return Profile.objects.get(user=self.user)
+
 class Cart(models.Model):
     course=models.ForeignKey(Course,on_delete=models.CASCADE)
     user=models.ForeignKey(User,on_delete=models.SET_NULL, blank=True,null=True)
