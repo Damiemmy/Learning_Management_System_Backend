@@ -81,6 +81,7 @@ class Category(models.Model):
     title = models.CharField(max_length=100)
     image = models.FileField(upload_to='course-file',default='category.jpg',null=True,blank=True)
     slug = models.SlugField(unique=True,null=True,blank=True)
+    active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural="Category"
@@ -112,7 +113,7 @@ class Course(models.Model):
     teacher_course_status=models.CharField(max_length=15, choices=TEACHER_STATUS, default="Published")
     featured=models.BooleanField(default=False)
     course_id=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="1234567890")
-    slug=models.SlugField(unique=True)
+    slug=models.SlugField(unique=True,blank=True,null=True)
     date=models.DateTimeField(default=timezone.now)
 
     def __str__(self):
