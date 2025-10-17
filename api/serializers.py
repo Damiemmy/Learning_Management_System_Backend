@@ -122,7 +122,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
      class Meta:
-        models=api_models.Cart
+        model=api_models.Cart
         fields='__all__'
     
 class CartOrderItemSerializer(serializers.ModelSerializer):
