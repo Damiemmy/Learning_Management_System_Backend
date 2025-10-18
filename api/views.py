@@ -170,3 +170,49 @@ class CartAPIView(generics.CreateAPIView):
 
             return Response({"message":"Cart Created Successfully"},status=status.HTTP_201_CREATED)
 
+class CartListAPIView(generics.ListAPIView):
+    serializer_class=api_serializer.CartSerializer
+    permission_classes=[AllowAny]
+
+    def get_queryset(self):
+        cart_id=self.kwargs['cart_id']
+        queryset=api_model.Cart.objects.filter(cart_id=cart_id)
+        return queryset
+
+class CartDestroyAPIView(generics.DestroyAPIView):
+    serializer_class=api_serializer.CartSerializer
+    permission_classes=[AllowAny]
+
+    def get_object(self):
+        cart_id=self.kwargs['cart_id']
+        item_id=self.kwargs['item_id']
+        return api_model.Cart.objects.filter(cart_id=cart_id,id=item_id).first()
+
+class CartStatsAPIView(generics.RetrieveAPIView):
+    serializer_class=api_serializer.CartSerializer
+    permission_classes=[AllowAny]
+    lookup_field='cart_id'
+
+    def get_queryset(self):
+        cart_id=self.kwargs['cart_id']
+        queryset=api_model.Cart.objects.filter(cart_id=cart_id)
+        return queryset
+
+    def get(sel,request,*args,**kwargs):
+        queryset=self.get_queryset()
+
+        total_price=0.00
+        total_tax=0.00
+        total_total=0.00
+
+        for cart_item in queryset:
+            total_price += float(self.calculate_price(cart_item))
+            total_tax += float(self.calculate_tax(cart_item))
+            total_total += round(float(self.calculate_total(cart_item)),2)
+
+    def calculate_price(self,cart_item):
+        return cart_item.price
+    def calculate_tax(self,cart_item):
+        return cart_item.tax_fee
+    def calculate_total(self,cart_item):
+        return cart_item.total

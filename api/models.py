@@ -227,7 +227,7 @@ class Cart(models.Model):
     task=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
     total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
     country=models.CharField(max_length=100, blank=True,null=True)
-    cart_id=ShortUUIDField(unique=True,length=6,max_length=20,alphabet="123456789")
+    cart_id=ShortUUIDField(length=6,max_length=20,alphabet="123456789")
     date=models.DateTimeField(default=timezone.now)
 
     def __str__(self):
