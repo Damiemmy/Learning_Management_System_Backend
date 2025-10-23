@@ -156,16 +156,36 @@ PAYPAL_CLIENT_SECRET=env('PAYPAL_CLIENT_SECRET')
 PAYPAL_MODE=env('PAYPAL_MODE')
 
 
-MAILGUN_API_KEY=env("MAILGUN_API_KEY")
-MAILGUN_SENDER_DOMAIN=env("MAILGUN_SENDER_DOMAIN")
+# MAILGUN_API_KEY=env("MAILGUN_API_KEY")
+# MAILGUN_SENDER_DOMAIN=env("MAILGUN_SENDER_DOMAIN")
 
-ANYMAIL={
-    "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-    "MAILGUN_SENDER_DOMAIN":env("MAILGUN_SENDER_DOMAIN")
-}
+# ANYMAIL={
+#     "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
+#     "MAILGUN_SENDER_DOMAIN":env("MAILGUN_SENDER_DOMAIN")
+# }
 
-FROM_EMAIL=env("FROM_EMAIL")
-EMAIL_BACKEND='anymail.backends.mailgun.EmailBackend'
+# FROM_EMAIL=env("FROM_EMAIL")
+# EMAIL_BACKEND='anymail.backends.mailgun.EmailBackend'
+
+# -------------------------
+# Flexible Email Setup
+# -------------------------
+# Email configuration
+ENVIRONMENT = env.str("DJANGO_ENV", default="development")
+
+SENDGRID_API_KEY = env("SENDGRID_API_KEY")
+FROM_EMAIL = env("FROM_EMAIL")
+
+if ENVIRONMENT == "development":
+    # During development: print emails in terminal
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "noreply@example.com"
+else:
+    # Production: Send real emails via SendGrid
+    EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+    SENDGRID_SANDBOX_MODE_IN_DEBUG = False  # Ensure emails are actually sent
+    DEFAULT_FROM_EMAIL = FROM_EMAIL
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),

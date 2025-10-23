@@ -35,46 +35,61 @@ def generate_random_otp(length=7):
     otp=''.join([str(random.randint(0,9)) for _ in range(length)])
     return otp
 class PasswordResetEmailVerifyAPIView(generics.RetrieveAPIView):
-    permission_classes= [AllowAny]
-    serializer_class=api_serializer.UserSerializer
+    permission_classes = [AllowAny]
+    serializer_class = api_serializer.UserSerializer
 
     def get_object(self):
-        email=self.kwargs['email']
-
-        user=User.objects.filter(email=email).first()
+        email = self.kwargs.get('email')
+        user = User.objects.filter(email=email).first()
 
         if user:
+            # Generate token and OTP
+            uuidb64 = user.pk
+            refresh = RefreshToken.for_user(user)
+            refresh_token = str(refresh.access_token)
 
-            uuidb64=user.pk
-            refresh=RefreshToken.for_user(user)
-            refresh_token=str(refresh.access_token)
-            user.refresh_token=refresh_token
-            user.otp=generate_random_otp()
+            user.refresh_token = refresh_token
+            user.otp = generate_random_otp()
             user.save()
 
-            link= f"http://localhost:513/create-new-password/?otp{user.otp}&uuidb64={uuidb64}&=refresh_token{refresh_token}"
+            link = f"{settings.FRONTEND_SITE_URL}create-new-password/?otp={user.otp}&uuidb64={uuidb64}&refresh_token={refresh_token}"
 
-            context={
-                "link":link,
-                "username":user.username
+            context = {
+                "link": link,
+                "username": user.username
             }
 
-            subject= "password Reset Email"
-            text_body=render_to_string("email/password_reset.txt",context)
-            html_body=render_to_string("email/password_reset.html",context)
+            # subject = "Password Reset Email"
+            # text_body = render_to_string("email/password_reset.txt", context)
+            # html_body = render_to_string("email/password_reset.html", context)
 
-            msg=EmailMultiAlternatives(
+            # msg = EmailMultiAlternatives(
+            #     subject=subject,
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     to=[user.email],
+            #     body=text_body
+            # )
+            # msg.attach_alternative(html_body, "text/html")
+            # msg.send()
+            subject = "Password Reset Email"
+            context = {
+                "link": link,
+                "username": user.username
+            }
+            text_body = render_to_string("email/password_reset.txt", context)
+            html_body = render_to_string("email/password_reset.html", context)
+
+            msg = EmailMultiAlternatives(
                 subject=subject,
-                from_email=settings.FROM_EMAIL,
+                from_email=settings.DEFAULT_FROM_EMAIL,  # must match verified SendGrid email
                 to=[user.email],
-                body=text_body
+                body=text_body,
+                reply_to=[settings.DEFAULT_FROM_EMAIL]   # optional but recommended
             )
-
-            msg.attach_alternative(html_body,"text/html")
+            msg.attach_alternative(html_body, "text/html")
             msg.send()
+            print("Password reset link:", link)
 
-            print("link ======",link)
-        
         return user
         
 class PasswordChangeAPIView(generics.CreateAPIView):
