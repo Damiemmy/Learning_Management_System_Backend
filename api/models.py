@@ -136,7 +136,7 @@ class Course(models.Model):
         return VariantItem.objects.filter(variant__course=self)
 
     def average_rating(self):
-        average_rating = Review.objects.filter(course=self).aggregate(avg_rating=models.Avg('rating'))
+        average_rating = Review.objects.filter(course=self,active=True).aggregate(avg_rating=models.Avg('rating'))
         return average_rating['avg_rating']
     
     def rating_count(self):
@@ -160,6 +160,7 @@ class Variant(models.Model):
 class VariantItem(models.Model):
     variant=models.ForeignKey(Variant,on_delete=models.CASCADE,related_name="variant_items")
     title= models.CharField(max_length=1000)
+    description=models.TextField(null=True,blank=True)
     file=models.FileField(upload_to="course-file")
     duration=models.DurationField(null=True,blank=True)
     content_duration=models.CharField(max_length=1000,null=True,blank=True)

@@ -111,14 +111,31 @@ class EnrolledCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model=api_models.EnrolledCourse
         fields='__all__'
+        
+    def __init__(self,*args,**kwargs):
+        super(EnrolledCourseSerializer,self).__init__(*args,**kwargs)
+        request=self.context.get("request")
+        if request and request.method =="POST":
+            self.Meta.depth=0
+        else:
+            self.Meta.depth=3
 
 class CourseSerializer(serializers.ModelSerializer):
     students=EnrolledCourseSerializer(many=True)
     curriculum=VariantItemSerializer(many=True)
     lectures=VariantItemSerializer(many=True)
+    reviews=ReviewSerializer(many=True)
     class Meta:
         model=api_models.Course
         fields=["category","teacher","file","image","title","description","price","language","level","platform_status","teacher_course_status","featured","course_id","slug","date","students","curriculum","lectures","average_rating","rating_count","reviews" ]
+
+    def __init__(self,*args,**kwargs):
+        super(CourseSerializer,self).__init__(*args,**kwargs)
+        request=self.context.get("request")
+        if request and request.method =="POST":
+            self.Meta.depth=0
+        else:
+            self.Meta.depth=3
 
 class CartSerializer(serializers.ModelSerializer):
      class Meta:
