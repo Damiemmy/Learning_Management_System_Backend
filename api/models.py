@@ -130,7 +130,7 @@ class Course(models.Model):
         return EnrolledCourse.objects.filter(course=self)
 
     def curriculum(self):
-        return VariantItem.objects.filter(variant__course=self)
+        return Variant.objects.filter(course=self)
 
     def lectures(self):
         return VariantItem.objects.filter(variant__course=self)

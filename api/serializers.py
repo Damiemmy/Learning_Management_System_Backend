@@ -66,7 +66,7 @@ class VariantItemSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 class VariantSerializer(serializers.ModelSerializer):
-    variant_items=VariantItemSerializer()
+    variant_items=VariantItemSerializer(many=True)
     class Meta:
         model=api_models.Variant
         fields='__all__'
@@ -122,7 +122,7 @@ class EnrolledCourseSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     students=EnrolledCourseSerializer(many=True)
-    curriculum=VariantItemSerializer(many=True)
+    curriculum=VariantSerializer(many=True)
     lectures=VariantItemSerializer(many=True)
     reviews=ReviewSerializer(many=True)
     class Meta:
