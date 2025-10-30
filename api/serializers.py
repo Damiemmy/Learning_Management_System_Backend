@@ -127,7 +127,7 @@ class CourseSerializer(serializers.ModelSerializer):
     reviews=ReviewSerializer(many=True)
     class Meta:
         model=api_models.Course
-        fields=["category","teacher","file","image","title","description","price","language","level","platform_status","teacher_course_status","featured","course_id","slug","date","students","curriculum","lectures","average_rating","rating_count","reviews" ]
+        fields=["id","category","teacher","file","image","title","description","price","language","level","platform_status","teacher_course_status","featured","course_id","slug","date","students","curriculum","lectures","average_rating","rating_count","reviews" ]
 
     def __init__(self,*args,**kwargs):
         super(CourseSerializer,self).__init__(*args,**kwargs)
@@ -138,20 +138,44 @@ class CourseSerializer(serializers.ModelSerializer):
             self.Meta.depth=3
 
 class CartSerializer(serializers.ModelSerializer):
-     class Meta:
+    class Meta:
         model=api_models.Cart
         fields='__all__'
+
+    def __init__(self,*args,**kwargs):
+        super(CartSerializer,self).__init__(*args,**kwargs)
+        request=self.context.get("request")
+        if request and request.method =="POST":
+            self.Meta.depth=0
+        else:
+            self.Meta.depth=3
     
 class CartOrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model=api_models.CartOrderItem
         fields='__all__'
 
+    def __init__(self,*args,**kwargs):
+        super(CartOrderItemSerializer,self).__init__(*args,**kwargs)
+        request=self.context.get("request")
+        if request and request.method =="POST":
+            self.Meta.depth=0
+        else:
+            self.Meta.depth=3
+
 class CartOrderSerializer(serializers.ModelSerializer):
     order_items=CartOrderItemSerializer(many=True)
     class Meta:
         model=api_models.CartOrder
         fields='__all__'
+
+    def __init__(self,*args,**kwargs):
+        super(CartOrderSerializer,self).__init__(*args,**kwargs)
+        request=self.context.get("request")
+        if request and request.method =="POST":
+            self.Meta.depth=0
+        else:
+            self.Meta.depth=3
 
 
 class CertificateSerializer(serializers.ModelSerializer):

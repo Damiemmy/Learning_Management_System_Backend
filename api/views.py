@@ -8,6 +8,8 @@ from userauth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from decimal import Decimal
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticated
 import stripe
 import requests
 
@@ -481,7 +483,10 @@ class SearchCourseAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         query=self.request.GET.get('query')
-        return api_models.Course.objects.filter(title__icontains=query,platform_status="Published", teacher_course_status="Published")
+        return api_model.Course.objects.filter(title__icontains=query,platform_status="Published", teacher_course_status="Published")
+
+
+
 
 
 

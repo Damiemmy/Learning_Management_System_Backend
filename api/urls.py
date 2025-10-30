@@ -1,6 +1,7 @@
 from api import views as api_views
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
+from . import views
 
 urlpatterns=[
     # Authentication Endpoints
@@ -19,7 +20,8 @@ urlpatterns=[
     path("course/course-detail/<slug>/",api_views.CourseDetailAPIView.as_view()),
     path("course/cart/",api_views.CartAPIView.as_view()),
     path("course/cart-list/<cart_id>",api_views.CartListAPIView.as_view()),
-    path("course/cart-delete<cart_id>/<item_id>",api_views.CartDestroyAPIView.as_view()),
+    path("course/cart-delete/<cart_id>/<item_id>",api_views.CartDestroyAPIView.as_view()),
+   
     path("cart/stats/<cart_id>/",api_views.CartStatsAPIView.as_view()),
     path("order/create-order/",api_views.CreateOrderAPIView.as_view()),
     path("order/checkout/<oid>/",api_views.CheckoutAPIView.as_view()),

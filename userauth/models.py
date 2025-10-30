@@ -54,4 +54,3 @@ post_save.connect(save_user_profile,User)
 
 
 
-    
