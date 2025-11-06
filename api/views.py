@@ -302,7 +302,7 @@ class CreateOrderAPIView(generics.CreateAPIView):
         order.total=total_total
         order.save()
 
-        return Response({"message":"order created Successfully"},status=status.HTTP_201_CREATED)
+        return Response({"message":"order created Successfully","order_oid":order.oid},status=status.HTTP_201_CREATED)
 
 class CheckoutAPIView(generics.RetrieveAPIView):
     serializer_class=api_serializer.CartOrderSerializer
@@ -338,12 +338,12 @@ class CouponApplyAPIView(generics.CreateAPIView):
                     i.save()
                     order.save()
                     coupon.used_by.add(order.student)
-                    return Response({"message":"Coupon Found and Activated"},status.HTTP_201_CREATED)
+                    return Response({"message":"Coupon Found and Activated","icon":"success"},status.HTTP_201_CREATED)
                 else:
-                    return Response({"message":"Coupon Already Applied"},status.HTTP_200_OK)
+                    return Response({"message":"Coupon Already Applied","icon":"warning"},status.HTTP_200_OK)
                     
         else:
-            return Response({"message":"Coupon Not Found"},status.HTTP_404_NOT_FOUND)
+            return Response({"message":"Coupon Not Found","icon":"error"},status.HTTP_404_NOT_FOUND)
 
 class StripeCheckoutAPIView(generics.CreateAPIView):
     serializer_class=api_serializer.CartOrderSerializer
@@ -385,7 +385,7 @@ class StripeCheckoutAPIView(generics.CreateAPIView):
             return Response({"message":f"something went Wrong when trying to make Payment.Error:{str(e)}"})
 
 def get_access_token(client_id,secrete_key):
-    token_url="https://api.sandbox.paypal.com/v1/oauth/token"
+    token_url="https://api.sandbox.paypal.com/v1/oauth2/token"
     data={'grant_type':'client_credentials'}
     auth=(client_id,secret_key)
     response=requests.post(token_url,data=data,auth=auth)
@@ -485,11 +485,51 @@ class SearchCourseAPIView(generics.ListAPIView):
         query=self.request.GET.get('query')
         return api_model.Course.objects.filter(title__icontains=query,platform_status="Published", teacher_course_status="Published")
 
+class StudentSummaryAPIView(generics.ListAPIView):
+    serializer_class=api_serializer.StudentSummarySerializer
+    permission_classes=[AllowAny]
 
+    def get_queryset(self):
+        user_id=self.kwargs['user_id']
+        user=User.objects.get(id=user_id)
 
+        total_courses=api_model.EnrolledCourse.objects.filter(user=user).count()
+        completed_lessons=api_model.CompletedLesson.objects.filter(user=user).count()
+        achieved_certificates=api_model.Certificate.objects.filter(user=user).count()
 
+        return [{
+            "total_courses":total_courses,
+            "completed_lesson":completed_lessons,
+            "achieved_certificates":achieved_certificates,
+        }]
 
+    def list(self,request,*args,**kwargs):
+        queryset= self.get_queryset()
+        serializer=self.get_serializer(queryset,many=True)
+        return Response(serializer.data)
 
+class StudentCourseListAPIView(generics.ListAPIView):
+    serializer_class=api_serializer.EnrolledCourseSerializer
+    permission_classes=[AllowAny]
+
+    def get_queryset(self):
+        user_id=self.kwargs['user_id']
+        user=User.objects.get(id=user_id)
+
+        return api_model.EnrolledCourse.objects.filter(user=user)
+
+class StudentCourseDetailAPIView(generics.RetrieveAPIView):
+    serializer_class=api_serializer.EnrolledCourseSerializer
+    permission_classes=[AllowAny]
+    lookup_field="enrollment_id"
+
+    def get_object(self):
+        user_id=self.kwargs['user_id']
+        enrollment_id=self.kwargs['enrollment_id']
+
+        user=User.objects.get(id=user_id)
+        enrollment=api_model.EnrolledCourse.objects.get(user=user,enrollment_id=enrollment_id)
+        return enrollment
 
 
 

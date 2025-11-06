@@ -107,7 +107,7 @@ class EnrolledCourseSerializer(serializers.ModelSerializer):
     curriculum=VariantSerializer(many=True,read_only=True)
     note=NoteSerializer(many=True,read_only=True)
     question_answer=Question_AnswerSerializer(many=True,read_only=True)
-    review=ReviewSerializer(many=True,read_only=True)
+    review=ReviewSerializer(read_only=True)
     class Meta:
         model=api_models.EnrolledCourse
         fields='__all__'
@@ -201,4 +201,7 @@ class CountrySerializer(serializers.ModelSerializer):
         fields= '__all__'
 
 
-    
+class StudentSummarySerializer(serializers.Serializer):
+    total_courses = serializers.IntegerField(default=0)
+    completed_lessons = serializers.IntegerField(default=0)
+    achieved_certificates = serializers.IntegerField(default=0)

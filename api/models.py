@@ -238,7 +238,7 @@ class CartOrder(models.Model):
     student=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
     teacher=models.ManyToManyField(Teacher,blank=True)
     sub_total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
-    task_fee=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
+    tax_fee=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
     total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
     initial_total=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)
     saved=models.DecimalField(max_digits=12,default=0.00,decimal_places=2)

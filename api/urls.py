@@ -21,14 +21,15 @@ urlpatterns=[
     path("course/cart/",api_views.CartAPIView.as_view()),
     path("course/cart-list/<cart_id>",api_views.CartListAPIView.as_view()),
     path("course/cart-delete/<cart_id>/<item_id>",api_views.CartDestroyAPIView.as_view()),
-   
     path("cart/stats/<cart_id>/",api_views.CartStatsAPIView.as_view()),
     path("order/create-order/",api_views.CreateOrderAPIView.as_view()),
     path("order/checkout/<oid>/",api_views.CheckoutAPIView.as_view()),
     path("order/coupon/",api_views.CouponApplyAPIView.as_view()),
     path("payment/stripe-checkout/<order_oid>",api_views.StripeCheckoutAPIView.as_view()),
     path("payment/payment-success/",api_views.PaymentSuccessAPIView.as_view()),
-    path("payment/payment-success/",api_views.PaymentSuccessAPIView.as_view()),
+    path("student/summary/<user_id>/",api_views.StudentSummaryAPIView.as_view()),
+    path("student/course-list/<user_id>/",api_views.StudentCourseListAPIView.as_view()),
+    path("student/course-detail/<user_id>/<enrollment_id>",api_views.StudentCourseDetailAPIView.as_view()),
 
     
 
