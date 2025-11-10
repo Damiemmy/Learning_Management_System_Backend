@@ -576,9 +576,19 @@ class StudentCourseCompleteAPIView(generics.CreateAPIView):
             api_model.CompletedLesson.objects.create(user=user,course=course,variant_item=variant_item)
             return Response({"message":"Course Marked as Completed"})
 
-class StudentNoteCreateAPIView(generics.CreateAPIView):
+class StudentNoteCreateAPIView(generics.ListCreateAPIView):
     serializer_class=api_serializer.NoteSerializer
     permission_classes=[AllowAny]
+
+    def get_queryset(self):
+        user_id=self.kwargs['user_id']
+        enrollment_id=self.kwargs['enrollment_id']
+
+        enrolled=api_model.EnrolledCourse.objects.get(enrollment_id=enrollment_id)
+        user=User.objects.get(id=user_id)
+        return api_model.Note.objects.filter(user=user,course=enrolled.course)
+
+
 
     def create(self,request,*args,**kwargs):
         user_id=request.data['user_id']
@@ -627,6 +637,19 @@ class StudentRateCourseCreateAPIView(generics.CreateAPIView):
             rating=rating
         )
         return Response({"message":"review created Successfully"},status=status.HTTP_201_CREATED)
+
+class StudentRateCourseUpdateAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class=api_serializer.ReviewSerializer
+    permission_classes=[AllowAny]
+
+    def get_object(self):
+        user_id=self.kwargs['user_id']
+        review_id=self.kwargs['review_id']
+
+        user=User.objects.get(id=user_id)
+        review=api_model.Review.objects.get(id=review_id,user=user)
+        return review
+
 
 
 

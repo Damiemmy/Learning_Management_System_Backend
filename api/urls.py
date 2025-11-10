@@ -32,9 +32,10 @@ urlpatterns=[
     path("student/course-list/<user_id>/",api_views.StudentCourseListAPIView.as_view()),
     path("student/course-detail/<user_id>/<enrollment_id>",api_views.StudentCourseDetailAPIView.as_view()),
     path("student/course-completed/",api_views.StudentCourseCompleteAPIView.as_view()),
-    path("student/course-note/",api_views.StudentNoteCreateAPIView.as_view()),
+    path("student/course-note/<user_id>/<enrollment_id>",api_views.StudentNoteCreateAPIView.as_view()),
     path("student/course-note-detail/<user_id>/<enrollment_id>/<note_id>/",api_views.StudentsNoteDetailAPIView.as_view()),
     path("student/rate-course/",api_views.StudentRateCourseCreateAPIView.as_view()),
+    path("student/review-detail/<user_id>/<review_id>",api_views.StudentRateCourseUpdateAPIView.as_view()),
 
     
 
