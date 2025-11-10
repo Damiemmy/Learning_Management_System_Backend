@@ -11,6 +11,7 @@ urlpatterns=[
     path("user/register/",api_views.RegisterView.as_view()),
     path("user/password-reset/<email>/",api_views.PasswordResetEmailVerifyAPIView.as_view()),
     path("user/password-change/",api_views.PasswordChangeAPIView.as_view()),
+    path("user/change-password/",api_views.ChangePasswordAPIView.as_view()),
 
     # Core Endpoints
 
@@ -30,6 +31,10 @@ urlpatterns=[
     path("student/summary/<user_id>/",api_views.StudentSummaryAPIView.as_view()),
     path("student/course-list/<user_id>/",api_views.StudentCourseListAPIView.as_view()),
     path("student/course-detail/<user_id>/<enrollment_id>",api_views.StudentCourseDetailAPIView.as_view()),
+    path("student/course-completed/",api_views.StudentCourseCompleteAPIView.as_view()),
+    path("student/course-note/",api_views.StudentNoteCreateAPIView.as_view()),
+    path("student/course-note-detail/<user_id>/<enrollment_id>/<note_id>/",api_views.StudentsNoteDetailAPIView.as_view()),
+    path("student/rate-course/",api_views.StudentRateCourseCreateAPIView.as_view()),
 
     
 
