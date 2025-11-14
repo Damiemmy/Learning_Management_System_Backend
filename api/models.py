@@ -388,7 +388,7 @@ class Wishlist(models.Model):
     course=models.ForeignKey(Course,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.code
+        return self.course.title
 
 class Country(models.Model):
     name=models.CharField(max_length=100)

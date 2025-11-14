@@ -650,8 +650,36 @@ class StudentRateCourseUpdateAPIView(generics.RetrieveUpdateAPIView):
         review=api_model.Review.objects.get(id=review_id,user=user)
         return review
 
+class StudentWishlistListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class=api_serializer.WishlistSerializer
+    permission_classes=[AllowAny]
 
+    def get_queryset(self):
+        user_id=self.kwargs['user_id']
+        user=User.objects.get(id=user_id)
 
+        wishlist=api_model.Wishlist.objects.filter(user=user)
+        return wishlist
 
+    def create(self,request,*args,**kwargs):
+        user_id=request.data['user_id']
+        course_id=request.data['course_id']
+
+        user=User.objects.get(id=user_id)
+        course=api_model.Course.objects.get(id=course_id)
+
+        wishlist=api_model.Wishlist.objects.filter(user=user,course=course).first()
+
+        if wishlist:
+            wishlist.delete()
+            return Response({"message":"wishlist deleted successfully"},status=status.HTTP_200_OK)
+
+        else:
+            create_wishlist= api_model.Wishlist.objects.create(
+                user=user,
+                course=course
+            )
+            return Response({"message":"Successfully Added to Wishlist"},status=status.HTTP_201_CREATED)
+    
 
 
