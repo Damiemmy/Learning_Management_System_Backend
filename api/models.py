@@ -190,6 +190,7 @@ class Question_Answer(models.Model):
     course=models.ForeignKey(Course,on_delete=models.CASCADE)
     user=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
     title=models.CharField(max_length=1000,null=True,blank=True)
+    qa_id=ShortUUIDField(length=6,max_length=20,alphabet="123456789")
     date=models.DateTimeField(default=timezone.now)
 
     def __str__(self):

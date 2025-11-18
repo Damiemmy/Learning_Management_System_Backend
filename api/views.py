@@ -680,6 +680,64 @@ class StudentWishlistListCreateAPIView(generics.ListCreateAPIView):
                 course=course
             )
             return Response({"message":"Successfully Added to Wishlist"},status=status.HTTP_201_CREATED)
-    
+
+class QuestionAnswerListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class=api_serializer.Question_AnswerSerializer
+    permission_classes=[AllowAny]
+
+    def get_queryset(self):
+        course_id=self.kwargs['course_id']
+        course=api_model.Course.objects.get(id=course_id)
+
+        question=api_model.Question_Answer.objects.filter(course=course)
+        return question
+
+    def create(self,request,*args,**kwargs):
+        course_id=request.data['course_id']
+        user_id=request.data['user_id']
+        message=request.data['message']
+        title=request.data['title']
+
+        user=User.objects.get(id=user_id)
+        course=api_model.Course.objects.get(id=course_id)
+
+        question_answer=api_model.Question_Answer.objects.create(
+            course=course,
+            user=user,
+            title=title
+        )
+
+        question_answer_message=api_model.Question_Answer_Message.objects.create(
+            user=user,
+            course=course,
+            question=question_answer,
+            message=message
+        )
+
+        return Response({"message":"Started a Group Chat"},status=status.HTTP_201_CREATED)
+
+class QuestionAnswerMessageSendAPIView(generics.CreateAPIView):
+    serializer_class=api_serializer.Question_Answer_MessageSerializer
+    permission_classes=[AllowAny]
+    def create(self,request,*args,**kwargs):
+        user_id=request.data['user_id']
+        course_id=request.data['course_id']
+        qa_id=request.data['qa_id']
+        message=request.data['message']
+
+        user=User.objects.get(id=user_id)
+        course=api_model.Course.objects.get(id=course_id)
+        question_answers=api_model.Question_Answer.objects.get(qa_id=qa_id)
+        question_answer_message=api_model.Question_Answer_Message.objects.create(
+            user=user,
+            course=course,
+            question=question_answers,
+            message=message
+        )
+
+        serializer=api_serializer.Question_AnswerSerializer(question_answers)
+        return Response({"message":"message sent","data":serializer.data},status=status.HTTP_201_CREATED)
+
+ 
 
 
